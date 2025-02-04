@@ -52,6 +52,12 @@ import { textEllipsisStyle } from '../UI/TextEllipsis';
 import FileWithLines from '../UI/CustomSvgIcons/FileWithLines';
 import TextButton from '../UI/TextButton';
 import { getRelativeOrAbsoluteDisplayDate } from '../Utils/DateDisplay';
+import { formatISO, subDays } from 'date-fns';
+import {
+  type GameMetrics,
+  getGameMetricsFrom,
+} from '../Utils/GDevelopServices/Analytics';
+
 // It's important to use remote and not electron for folder actions,
 // otherwise they will be opened in the background.
 // See https://github.com/electron/electron/issues/4349#issuecomment-777475765
@@ -213,8 +219,20 @@ const GameDashboardCard = ({
       ]
     : null;
 
+  const [gameRollingMetrics, setGameMetrics] = React.useState<?(GameMetrics[])>(
+    null
+  );
+
+  const [gameRollingMetricsError, setGameMetricsError] = React.useState<?Error>(
+    null
+  );
+
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const { profile, onOpenLoginDialog } = authenticatedUser;
+  const {
+    getAuthorizationHeader,
+    profile,
+    onOpenLoginDialog,
+  } = authenticatedUser;
   const { removeRecentProjectFile } = React.useContext(PreferencesContext);
   const {
     showAlert,
@@ -245,6 +263,40 @@ const GameDashboardCard = ({
         projectFileMetadataAndStorageProviderName.storageProviderName
       )
     : null;
+
+  const last7DaysIsoDate = formatISO(subDays(new Date(), 7), {
+    representation: 'date',
+  });
+
+  const [isGameMetricsLoading, setIsGameMetricsLoading] = React.useState(false);
+
+  const hasNoSession = gameRollingMetrics && gameRollingMetrics.length === 0;
+
+  const loadGameMetrics = React.useCallback(
+    async () => {
+      if (!profile) return;
+
+      const { id } = profile;
+
+      setIsGameMetricsLoading(true);
+      setGameMetricsError(null);
+      try {
+        const gameRollingMetrics = await getGameMetricsFrom(
+          getAuthorizationHeader,
+          id,
+          game.id,
+          last7DaysIsoDate
+        );
+        setGameMetrics(gameRollingMetrics);
+        console.log(gameRollingMetrics);
+      } catch (err) {
+        console.error(`Unable to load game rolling metrics:`, err);
+        setGameMetricsError(err);
+      }
+      setIsGameMetricsLoading(false);
+    },
+    [getAuthorizationHeader, profile, game, last7DaysIsoDate]
+  );
 
   const renderPublicInfo = () => {
     const DiscoverabilityIcon =
@@ -516,7 +568,27 @@ const GameDashboardCard = ({
                 let message = t`Your game and this project will be deleted. This action is irreversible. Do you want to continue?`;
 
                 if (isPublishedOnGdGames) {
-                  message = t`This game is public on gd.games.${'\n\n'}If you continue the game and this project will be deleted. This action is irreversible. Do you want to continue?`;
+                  loadGameMetrics();
+
+                  if (gameRollingMetrics) {
+                    // TODO
+                    // gameRollingMetrics is an array of something but return always an empty array, because of no stats on dev ?
+                    // GDevelop\GDevelop\newIDE\app\src\Utils\GDevelopServices\Analytics.js
+
+                    console.log(gameRollingMetrics);
+
+                    const countOfSessionLast7Days = hasNoSession
+                      ? 0
+                      : gameRollingMetrics.sessions.d0Sessions;
+
+                    // TODO
+                    // See why in local there is no return carriage working
+
+                    message = t`You're deleting a game that has:${'\n\n'}
+                    - ${countOfSessionLast7Days} views on the last 7 days${'\n'}
+                    - Is published on gd.games${'\n\n'}                  
+                    If you continue the game and this project will be deleted. This action is irreversible. Do you want to continue?`;
+                  }
                 }
 
                 const answer = await showDeleteConfirmation({
