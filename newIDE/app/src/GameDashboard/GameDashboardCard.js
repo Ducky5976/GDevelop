@@ -571,14 +571,18 @@ const GameDashboardCard = ({
                   if (gameRollingMetrics) {
                     // TODO
                     // gameRollingMetrics is an array of something but return always an empty array, because of no stats on dev ?
-                    // GDevelop\GDevelop\newIDE\app\src\Utils\GDevelopServices\Analytics.js
+                    // Develop\GDevelop\newIDE\app\src\Utils\GDevelopServices\Analytics.js
 
                     //console.log(gameRollingMetrics.retention.d7RetainedPlayers);
-                    console.log(gameRollingMetrics);
+
+                    // get only the last 7 days.
+                    console.log(gameRollingMetrics.slice(0, 7)); 
+
+                    //Voir comment concaténé les d0Sessions de gameRollingMetrics pour avoir les joueurs des 7 derniers jours. 
 
                     const countOfSessionLast7Days = hasNoSession
                       ? 0
-                      : gameRollingMetrics.sessions.d0Sessions;
+                      : gameRollingMetrics[0].sessions.d0Sessions;
 
                     // TODO
                     // See why in local there is no return carriage working
