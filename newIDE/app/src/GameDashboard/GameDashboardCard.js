@@ -516,7 +516,7 @@ const GameDashboardCard = ({
                 let message = t`Your game and this project will be deleted. This action is irreversible. Do you want to continue?`;
 
                 if (isPublishedOnGdGames) {
-                  message = t`This game is public on gd.games. If you continue the game and this project will be deleted. This action is irreversible. Do you want to continue?`;
+                  message = t`This game is public on gd.games.${'\n\n'}If you continue the game and this project will be deleted. This action is irreversible. Do you want to continue?`;
                 }
 
                 const answer = await showDeleteConfirmation({
