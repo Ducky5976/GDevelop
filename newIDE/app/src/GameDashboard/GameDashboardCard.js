@@ -513,9 +513,15 @@ const GameDashboardCard = ({
                 // Extract word translation to ensure it is not wrongly translated in the sentence.
                 const translatedConfirmText = i18n._(t`delete`);
 
+                let message = t`Your game and this project will be deleted. This action is irreversible. Do you want to continue?`;
+
+                if (isPublishedOnGdGames) {
+                  message = t`This game is public on gd.games. If you continue the game and this project will be deleted. This action is irreversible. Do you want to continue?`;
+                }
+
                 const answer = await showDeleteConfirmation({
                   title: t`Delete game`,
-                  message: t`Your game will be deleted. This action is irreversible. Do you want to continue?`,
+                  message: message,
                   confirmButtonLabel: t`Delete game`,
                   fieldMessage: t`To confirm, type "${translatedConfirmText}"`,
                   confirmText: translatedConfirmText,
