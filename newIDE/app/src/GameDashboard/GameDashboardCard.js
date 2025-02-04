@@ -564,17 +564,16 @@ const GameDashboardCard = ({
               click: async () => {
                 // Extract word translation to ensure it is not wrongly translated in the sentence.
                 const translatedConfirmText = i18n._(t`delete`);
-
                 let message = t`Your game and this project will be deleted. This action is irreversible. Do you want to continue?`;
 
                 if (isPublishedOnGdGames) {
                   loadGameMetrics();
-
                   if (gameRollingMetrics) {
                     // TODO
                     // gameRollingMetrics is an array of something but return always an empty array, because of no stats on dev ?
                     // GDevelop\GDevelop\newIDE\app\src\Utils\GDevelopServices\Analytics.js
 
+                    //console.log(gameRollingMetrics.retention.d7RetainedPlayers);
                     console.log(gameRollingMetrics);
 
                     const countOfSessionLast7Days = hasNoSession
