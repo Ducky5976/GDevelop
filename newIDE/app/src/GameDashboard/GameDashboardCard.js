@@ -53,11 +53,6 @@ import FileWithLines from '../UI/CustomSvgIcons/FileWithLines';
 import TextButton from '../UI/TextButton';
 import { MarkdownText } from '../UI/MarkdownText';
 import { getRelativeOrAbsoluteDisplayDate } from '../Utils/DateDisplay';
-import { formatISO, subDays } from 'date-fns';
-import {
-  type GameMetrics,
-  getGameMetricsFrom,
-} from '../Utils/GDevelopServices/Analytics';
 import ImageThumbnail from '../ResourcesList/ResourceThumbnail/ImageThumbnail';
 
 // It's important to use remote and not electron for folder actions,
@@ -221,14 +216,6 @@ const GameDashboardCard = ({
       ]
     : null;
 
-  const [gameRollingMetrics, setGameMetrics] = React.useState<?(GameMetrics[])>(
-    null
-  );
-
-  const [gameRollingMetricsError, setGameMetricsError] = React.useState<?Error>(
-    null
-  );
-
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
     getAuthorizationHeader,
@@ -266,14 +253,6 @@ const GameDashboardCard = ({
         projectFileMetadataAndStorageProviderName.storageProviderName
       )
     : null;
-
-  const last7DaysIsoDate = formatISO(subDays(new Date(), 7), {
-    representation: 'date',
-  });
-
-  const [isGameMetricsLoading, setIsGameMetricsLoading] = React.useState(false);
-
-  const hasNoSession = gameRollingMetrics && gameRollingMetrics.length === 0;
 
   const renderPublicInfo = () => {
     const DiscoverabilityIcon =
