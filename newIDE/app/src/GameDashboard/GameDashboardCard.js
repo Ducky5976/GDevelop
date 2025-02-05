@@ -51,12 +51,14 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
 import FileWithLines from '../UI/CustomSvgIcons/FileWithLines';
 import TextButton from '../UI/TextButton';
+import { MarkdownText } from '../UI/MarkdownText';
 import { getRelativeOrAbsoluteDisplayDate } from '../Utils/DateDisplay';
 import { formatISO, subDays } from 'date-fns';
 import {
   type GameMetrics,
   getGameMetricsFrom,
 } from '../Utils/GDevelopServices/Analytics';
+import ImageThumbnail from '../ResourcesList/ResourceThumbnail/ImageThumbnail';
 
 // It's important to use remote and not electron for folder actions,
 // otherwise they will be opened in the background.
@@ -539,18 +541,35 @@ const GameDashboardCard = ({
               click: async () => {
                 // Extract word translation to ensure it is not wrongly translated in the sentence.
                 const translatedConfirmText = i18n._(t`delete`);
-                let message = t`Your game and this project will be deleted. This action is irreversible. Do you want to continue?`;
 
-                if (isPublishedOnGdGames) {
-                  message = t`You're deleting a game that has:${'\n\n'}
-                    - ${countOfSessionsLastWeek} views on the last 7 days${'\n'}
-                    - Is published on gd.games${'\n\n'}                  
-                    If you continue the game and this project will be deleted. This action is irreversible. Do you want to continue?`;
-                }
+                const hasPlayerMessage = countOfSessionsLastWeek
+                  ? t`${countOfSessionsLastWeek} views on the last 7 days`
+                  : t`No players`;
+                const hasBeenPublished = isPublishedOnGdGames
+                  ? t`Is published on gd.games`
+                  : t`Not published`;
+
+                const message = t`You're deleting a game that has:${'\n\n'}
+                    - ${i18n._(hasPlayerMessage)}
+                    ${'\n'}
+                    - ${i18n._(hasBeenPublished)}
+                    ${'\n\n'}
+                    If you continue the game and this project will be deleted.${'\n\n'}
+                    This action is irreversible. Do you want to continue?`;
 
                 const answer = await showDeleteConfirmation({
                   title: t`Delete game`,
+                  header: (
+                    <GameThumbnail
+                      gameName={gameName || 'unknown game'}
+                      gameId={game ? game.id : undefined}
+                      thumbnailUrl={gameThumbnailUrl}
+                      background="light"
+                      width={getThumbnailWidth({ isMobile })}
+                    />
+                  ),
                   message: message,
+
                   confirmButtonLabel: t`Delete game`,
                   fieldMessage: t`To confirm, type "${translatedConfirmText}"`,
                   confirmText: translatedConfirmText,
