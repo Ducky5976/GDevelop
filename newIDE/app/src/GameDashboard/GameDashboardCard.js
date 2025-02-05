@@ -241,6 +241,7 @@ const GameDashboardCard = ({
   } = useAlertDialog();
 
   const isPublishedOnGdGames = !!game && game.publicWebBuildId;
+  const countOfSessionsLastWeek = game ? game.cachedLastWeekSessionsCount : 0;
   const gameUrl = isPublishedOnGdGames ? getGameUrl(game) : null;
 
   const gameThumbnailUrl = React.useMemo(
@@ -271,32 +272,6 @@ const GameDashboardCard = ({
   const [isGameMetricsLoading, setIsGameMetricsLoading] = React.useState(false);
 
   const hasNoSession = gameRollingMetrics && gameRollingMetrics.length === 0;
-
-  const loadGameMetrics = React.useCallback(
-    async () => {
-      if (!profile) return;
-
-      const { id } = profile;
-
-      setIsGameMetricsLoading(true);
-      setGameMetricsError(null);
-      try {
-        const gameRollingMetrics = await getGameMetricsFrom(
-          getAuthorizationHeader,
-          id,
-          game.id,
-          last7DaysIsoDate
-        );
-        setGameMetrics(gameRollingMetrics);
-        console.log(gameRollingMetrics);
-      } catch (err) {
-        console.error(`Unable to load game rolling metrics:`, err);
-        setGameMetricsError(err);
-      }
-      setIsGameMetricsLoading(false);
-    },
-    [getAuthorizationHeader, profile, game, last7DaysIsoDate]
-  );
 
   const renderPublicInfo = () => {
     const DiscoverabilityIcon =
@@ -567,31 +542,10 @@ const GameDashboardCard = ({
                 let message = t`Your game and this project will be deleted. This action is irreversible. Do you want to continue?`;
 
                 if (isPublishedOnGdGames) {
-                  loadGameMetrics();
-                  if (gameRollingMetrics) {
-                    // TODO
-                    // gameRollingMetrics is an array of something but return always an empty array, because of no stats on dev ?
-                    // Develop\GDevelop\newIDE\app\src\Utils\GDevelopServices\Analytics.js
-
-                    //console.log(gameRollingMetrics.retention.d7RetainedPlayers);
-
-                    // get only the last 7 days.
-                    console.log(gameRollingMetrics.slice(0, 7)); 
-
-                    //Voir comment concaténé les d0Sessions de gameRollingMetrics pour avoir les joueurs des 7 derniers jours. 
-
-                    const countOfSessionLast7Days = hasNoSession
-                      ? 0
-                      : gameRollingMetrics[0].sessions.d0Sessions;
-
-                    // TODO
-                    // See why in local there is no return carriage working
-
-                    message = t`You're deleting a game that has:${'\n\n'}
-                    - ${countOfSessionLast7Days} views on the last 7 days${'\n'}
+                  message = t`You're deleting a game that has:${'\n\n'}
+                    - ${countOfSessionsLastWeek} views on the last 7 days${'\n'}
                     - Is published on gd.games${'\n\n'}                  
                     If you continue the game and this project will be deleted. This action is irreversible. Do you want to continue?`;
-                  }
                 }
 
                 const answer = await showDeleteConfirmation({
