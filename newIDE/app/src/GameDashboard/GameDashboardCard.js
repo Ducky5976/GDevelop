@@ -51,9 +51,7 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
 import FileWithLines from '../UI/CustomSvgIcons/FileWithLines';
 import TextButton from '../UI/TextButton';
-import { MarkdownText } from '../UI/MarkdownText';
 import { getRelativeOrAbsoluteDisplayDate } from '../Utils/DateDisplay';
-import ImageThumbnail from '../ResourcesList/ResourceThumbnail/ImageThumbnail';
 
 // It's important to use remote and not electron for folder actions,
 // otherwise they will be opened in the background.
@@ -218,7 +216,6 @@ const GameDashboardCard = ({
 
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
-    getAuthorizationHeader,
     profile,
     onOpenLoginDialog,
   } = authenticatedUser;
