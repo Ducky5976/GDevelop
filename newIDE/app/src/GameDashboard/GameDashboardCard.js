@@ -517,15 +517,15 @@ const GameDashboardCard = ({
               click: async () => {
                 // Extract word translation to ensure it is not wrongly translated in the sentence.
                 const translatedConfirmText = i18n._(t`delete`);
-
+                
                 const hasPlayerMessage = countOfSessionsLastWeek
-                  ? t`${countOfSessionsLastWeek} views on the last 7 days`
-                  : t`No players`;
+                  ? t`Has ${countOfSessionsLastWeek} views in the last 7 days`
+                  : t`Has no players`;
                 const hasBeenPublished = isPublishedOnGdGames
                   ? t`Is published on gd.games`
-                  : t`Not published`;
+                  : t`Is not published`;
 
-                const message = t`You're deleting a game that has:${'\n\n'}
+                const message = t`You're deleting a game which:${'\n\n'}
                     - ${i18n._(hasPlayerMessage)}
                     ${'\n'}
                     - ${i18n._(hasBeenPublished)}
